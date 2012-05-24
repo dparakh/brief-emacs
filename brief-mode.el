@@ -218,7 +218,7 @@
 (global-set-key [?\M-m] 'mark-m)
 ;;(global-set-key [?\M-n] 'bury-buffer)
 ;;; kb:  Alt-n          - Next buffer
-(global-set-key [?\M-n] 'next-buffer-here)
+(global-set-key [?\M-n] 'next-buffer)
 
 ;;; kb:
 ;;; kb: == for tty environment. Or notepad that has no standard grey-pad keys
@@ -273,7 +273,7 @@
 ;;; kb:  Ctrl-minus     - Delete curr. buffer
 (global-set-key [?\C--] 'kill-this-buffer)
 ;;; kb:  Alt-minus      - Previous buffer
-(global-set-key [?\M--] 'previous-buffer-here)
+(global-set-key [?\M--] 'previous-buffer)
 ;;; kb:
 
 
@@ -1756,7 +1756,7 @@
 ;;; ============================================================= &cfs ===
 ;=========================================== Complementary functions  ====
 
-(defun next-buffer ()
+(defun next-buffer_ ()
   ""
   (interactive)
   (bury-buffer (current-buffer))
@@ -1764,7 +1764,7 @@
   (if (string-match "*" (buffer-name))
 	  (next-buffer)))
 
-(defun previous-buffer (&optional buf)
+(defun previous-buffer_ (&optional buf)
   "Select buffer BUF, or the last one in the buffer list.
 This function is the opposite of `bury-buffer'."
 ; Credit: Joerg Erdmenger
