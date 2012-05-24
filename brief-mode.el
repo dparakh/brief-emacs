@@ -209,16 +209,16 @@
 ;;; kb:  Alt-k          - delete to the end of line
 (global-set-key [?\M-k] 'kill-line)
 ;;; kb:  Alt-i          - Phy. tab (Brief default: Switch insert/overwrite mode)
-;(global-set-key [?\M-i] 'overwrite-mode) 	;; reserve M-i for phy. tab
+(global-set-key [?\M-i] 'overwrite-mode) 	;; reserve M-i for phy. tab
 (global-set-key [?\C-\M-i] 'overwrite-mode) 	;; no work?
 (global-set-key [M-tab] 'overwrite-mode) 	;; no work?
 ;;; kb:  Alt-l          - Mark line region
 (global-set-key [?\M-l] 'mark-l)
 ;;; kb:  Alt-m          - Mark stream region
 (global-set-key [?\M-m] 'mark-m)
-(global-set-key [?\M-n] 'bury-buffer)
+;;(global-set-key [?\M-n] 'bury-buffer)
 ;;; kb:  Alt-n          - Next buffer
-(global-set-key [?\M-n] 'next-buffer)
+(global-set-key [?\M-n] 'next-buffer-here)
 
 ;;; kb:
 ;;; kb: == for tty environment. Or notepad that has no standard grey-pad keys
@@ -226,8 +226,10 @@
 ;;; kb:
 ;; find & replace, idea from wordstar
 ;;; kb:  C-q C-f	- Search
+(global-set-key [?\M-s] 'mysearch)	;; the brief default
 (global-set-key "\C-q\C-f" 'mysearch)
 ;;; kb:  C-q C-a	- Replace
+(global-set-key [?\M-t] 'myquery-replace)	;; the brief default
 (global-set-key "\C-q\C-a" 'myquery-replace)
 ;;; kb:  C-q C-l	- Repeat last search/replace
 (global-set-key "\C-q\C-l" 'myresearch)
@@ -267,11 +269,11 @@
 ;;; kb:  Alt-r          - Insert file
 (global-set-key [?\M-r] 'insert-file)
 ;;; kb:  Alt-w          - Write current buffer to other file.
-(global-set-key [?\M-w] 'write-file)
+(global-set-key [?\M-w] 'save-buffer)
 ;;; kb:  Ctrl-minus     - Delete curr. buffer
 (global-set-key [?\C--] 'kill-this-buffer)
 ;;; kb:  Alt-minus      - Previous buffer
-(global-set-key [?\M--] 'previous-buffer)
+(global-set-key [?\M--] 'previous-buffer-here)
 ;;; kb:
 
 
@@ -287,13 +289,13 @@
 (global-set-key [?\C-t] 'kill-word)
 (global-set-key [?\C-t] 'kill-word-or-whitespace)
 ;;; kb:  Alt-t          - Toggle truncate mode (see descripton above)
-(global-set-key [?\M-t] 'invert-truncation)
+;; (global-set-key [?\M-t] 'invert-truncation)
 
 ;;; kb:  Alt-u          - Unmark region
 (global-set-key [?\M-u] 'mark-release)
 ;;; kb:  Alt-x          - Emacs default. 
 ;; brief default: Exit from emacs. 
-;(global-set-key [?\M-x] 'save-buffers-kill-emacs)
+;;(global-set-key [?\M-x] 'save-buffers-kill-emacs)
 
 ;; Alt-Meta key binding
 (global-set-key [?\A-\M-e]    'find-file-other-frame)
@@ -309,18 +311,28 @@
 ;;; kb:  Alt-F1		- show help for the function at the cursor
 (global-set-key [M-f1]	'(lambda() (interactive) (manual-entry (current-word))))
 
-(global-set-key [f2 down]    'enlarge-window)
 ;;; kb:  F2 \/          - Enlarge window vertically
-(global-set-key [f3 down]    'split-window-vertically)
+(global-set-key [f2 down]    'enlarge-window)
+
+;; Prepare a prefix map for f3
+(define-prefix-command 'split-window-map)
+(global-set-key [f3] 'split-window-map)
+
+;;; kb:  F3 \/          - Split window vertically
+(define-key split-window-map [down] 'split-window-vertically)
+;;;(global-set-key [f3 down]    'split-window-vertically)
+
+;;; kb:  F3 ->          - Split window horizontally
+(define-key split-window-map [right] 'split-window-horizontally)
+;;;(global-set-key [f3 right]   'split-window-horizontally)
+
+
 ;;; kb:  F2 /\          - Shrink window vertically
 (global-set-key [f2 up]      'shrink-window)
 ;;; kb:  F2 ->          - Enlarge window horizontally
 (global-set-key [f2 left]    'shrink-window-horizontally)
 ;;; kb:  F2 <-          - Shrink window horizontally
 (global-set-key [f2 right]   'enlarge-window-horizontally)
-;;; kb:  F3 ->          - Split window horizontally
-(global-set-key [f3 right]   'split-window-horizontally)
-;;; kb:  F3 \/          - Split window vertically
 
 ;;; kb:  F4             - Delete all other windows
 (global-set-key [f4]         'delete-other-windows)
@@ -377,6 +389,7 @@
 (global-set-key [f12]        'repeat-complex-command)      ; F12 or Again
 (global-set-key [f13]        'mark-m)                      ; Props
 (global-set-key [f14]        'undo)                        ; Undo
+(global-set-key [kp-multiply] 'undo)                        ; Undo
 (global-set-key [f24]        'kill-buffer)                 ; R4
 (global-set-key [help help]  'help-for-help)               ; Help Help
 (global-set-key [help]       'help-command)                ; Help
@@ -410,8 +423,15 @@
 ;;; kb:  End            - End of current line
 ;;; kb:  End End        - End of current window
 ;;; kb:  End End End    - End of current file
-(global-set-key [end]           'end)                      ; End
-(global-set-key [home]          'home)                     ; Home
+(if (eq window-system 'ns)
+  (define-key osx-key-mode-map [end]   'goend)                     ; Home
+  (global-set-key [end]   'goend)                     ; Home
+)
+(if (eq window-system 'ns)
+  (define-key osx-key-mode-map [home]   'gohome)                     ; Home
+  (global-set-key [home]   'gohome)                     ; Home
+)
+
 ;;; kb:  Cntrl Home     - Begin of current window
 (global-set-key [C-home] 'beginning-of-window)
 ;;; kb:  Cntrl End      - End of current window
@@ -432,7 +452,7 @@
 ;;; kb:
 ;;; kb: == Keypad binding
 ;;; kb:
-;(global-set-key [insert]        'insert-key)               ; reserve for insert toggle, use S-insert instead
+(global-set-key [insert]        'insert-key)               ; reserve for insert toggle, use S-insert instead
 (global-set-key [f18]           'insert-key)               ;  Sun's Paste key
 (global-set-key [S-kp-0]	'insert-key)               ; linux name
 ;;; kb:  Shift-Ins      - Paste region (line/stream/rectangle) from yanc-buffer
@@ -456,10 +476,14 @@
 
 ;;; kb:
 ;;; kb:  Del            - Delete current character.
-(global-set-key [delete]        'delete-char)              ; Delete
-(global-set-key [DEL]           'delete-char)              ; Delete
+;; old one (global-set-key [delete]        'delete-char)              ; Delete
+(if (eq window-system 'ns)
+  (define-key osx-key-mode-map [kp-delete]  'grey-delete)                     ; Home
+ (global-set-key [delete]        'grey-delete)              ; Delete
+)
+(global-set-key [\d]           'delete-char)              ; Delete
 (global-set-key [M-delete]      'backward-kill-word-or-whitespace)
-(global-set-key [M-DEL]		'backward-kill-word-or-whitespace)
+(global-set-key [M-\d]		'backward-kill-word-or-whitespace)
 (global-set-key [backspace]     'delete-backward-char)     ; BackSpace
 (global-set-key [M-backspace] 	'backward-kill-word-or-whitespace)     ; M-BackSpace
 
@@ -857,40 +881,45 @@
 
 ;;; ------------------------------------------------------------- &hne ---
 ;                                                                 HOME/END
-(defun home ()
-  "Home - begin of line, once more - screen, once more - buffer."
-  (interactive nil)
-  (cond
-    ((and (eq last-command 'home) (eq last-last-command 'home))
-     (goto-char (point-min))
-    )
-    ((eq last-command 'home)
-     (move-to-window-line 0)
-    )
-    (t
-     (beginning-of-line)
-    )
-  )
-  (setq last-last-command last-command)
-)
+(defun gohome ()
+  "Go to beginning of line/window/buffer.
+  First hitting key goes to beginning of line, second in a row goes to
+  beginning of window, third in a row goes to beginning of buffer."
+  (interactive)
+  (let* ((keys (recent-keys))
+	 (len (length keys))
+	 (key1 (if (> len 0) (elt keys (- len 1)) nil))
+	 (key2 (if (> len 1) (elt keys (- len 2)) nil))
+	 (key3 (if (> len 2) (elt keys (- len 3)) nil))
+	 (key-equal-1 (eq key1 key2))
+	 (key-equal-2 (and key-equal-1 (eq key2 key3))))
+    (cond (key-equal-2 (if mark-active
+			   (goto-char (point-min))
+			 (beginning-of-buffer)))
+	  (key-equal-1 (if mark-active () (push-mark))
+		       (move-to-window-line 0))
+	  (t (beginning-of-line)))))
 
-(defun end ()
-  "End - end of line, once more - screen, once more - buffer."
-  (interactive nil)
-  (cond
-    ((and (eq last-command 'end) (eq last-last-command 'end))
-     (goto-char (point-max))
-    )
-    ((eq last-command 'end)
-     (move-to-window-line -1)
-     (end-of-line)
-    )
-    (t
-     (end-of-line)
-    )
-  )
-  (setq last-last-command last-command)
-)
+(defun goend ()
+  "Go to end of line/window/buffer.
+  First hitting key goes to end of line, second in a row goes to end
+  of window, third in a row goes to end of buffer."
+  (interactive)
+  (let* ((keys (recent-keys))
+	 (len (length keys))
+	 (key1 (if (> len 0) (elt keys (- len 1)) nil))
+	 (key2 (if (> len 1) (elt keys (- len 2)) nil))
+	 (key3 (if (> len 2) (elt keys (- len 3)) nil))
+	 (key-equal-1 (eq key1 key2))
+	 (key-equal-2 (and key-equal-1 (eq key2 key3))))
+    (cond (key-equal-2 (if mark-active
+			   (goto-char (point-max))
+			 (end-of-buffer)))
+	  (key-equal-1 (if mark-active () (push-mark))
+		       (move-to-window-line -1)
+		       (end-of-line))
+	  (t (end-of-line)))))
+
 
 
 ;;; ------------------------------------------------------------- &snp ---
@@ -1241,34 +1270,81 @@
   "Perform functions of Grey Minus in Brief style."
   (interactive nil)
   (cond
-    ((eq reg-flag 'c)
-      (kill-rectangle reg-point (point))
-      (setq reg-in-scrap-flag 'c)
-      (remove-mark-hook)
-      (message "Rectangle region cut to scrap")
+   ((eq reg-flag 'c)
+    (kill-rectangle reg-point (point))
+    (setq reg-in-scrap-flag 'c)
+    (remove-mark-hook)
+    (message "Rectangle region cut to scrap")
     )
-    ((eq reg-flag 'm)
-      (kill-region reg-point (point))
-      (setq reg-in-scrap-flag 'm)
-      (remove-mark-hook)
-      (message "Stream region cut to scrap")
+   ((eq reg-flag 'm)
+    (kill-region reg-point (point))
+    (setq reg-in-scrap-flag 'm)
+    (remove-mark-hook)
+    (message "Stream region cut to scrap")
     )
-    ((eq reg-flag 'l)
-      (if (< (point) reg-point)
-	  (cut-lines (point) reg-point)
-	  (cut-lines reg-point (point))
+   ((eq reg-flag 'l)
+    (if (< (point) reg-point)
+	(cut-lines (point) reg-point)
+      (cut-lines reg-point (point))
       )
-      (setq reg-in-scrap-flag 'l)
-      (remove-mark-hook)
-      (message "Line region cut to scrap")
+    (setq reg-in-scrap-flag 'l)
+    (remove-mark-hook)
+    (message "Line region cut to scrap")
     )
-    (t
-      (delete-line)
-      (setq reg-in-scrap-flag 'l)
+   (mark-active
+    (kill-region (point) (mark))
+    (setq reg-in-scrap-flag 'm)
+    (and transient-mark-mode mark-active (deactivate-mark))
+    (message "Marked region cut to scrap")
     )
-  )
+   (t
+    (delete-line)
+    (setq reg-in-scrap-flag 'l)
+    )
+   )
   (setq reg-flag nil)
 )
+
+(defun grey-delete ()
+  "Perform functions of Grey Delete in Brief style."
+  (interactive nil)
+  (cond
+   ((eq reg-flag 'c)
+    (kill-rectangle reg-point (point))
+    (remove-mark-hook)
+    (setq kill-ring (cdr kill-ring))
+    (message "Rectangle region deleted")
+    )
+   ((eq reg-flag 'm)
+    (kill-region reg-point (point))
+    (remove-mark-hook)
+    (setq kill-ring (cdr kill-ring))
+    (message "Stream region deleted")
+    )
+   ((eq reg-flag 'l)
+    (if (< (point) reg-point)
+	(cut-lines (point) reg-point)
+      (cut-lines reg-point (point))
+      )
+    (remove-mark-hook)
+    (setq kill-ring (cdr kill-ring))
+    (message "Line region deleted")
+    )
+   (mark-active
+    (kill-region (point) (mark))
+    (setq kill-ring (cdr kill-ring))
+    (and transient-mark-mode mark-active (deactivate-mark))
+    (message "Marked region deleted")
+    )
+   (t
+    (delete-char 1)
+    )
+   )
+  (setq reg-flag nil)
+  )
+
+
+
 
 (defun grey-minus-to-reg (char)
   "Perform functions of Grey Minus in Brief style (to register)."
@@ -1335,6 +1411,12 @@
       (setq reg-in-scrap-flag 'l)
       (remove-mark-hook)
       (message "Line region copied to scrap")
+    )
+   (mark-active
+      (copy-region-as-kill (point) (mark))
+      (setq reg-in-scrap-flag 'm)
+      (and transient-mark-mode mark-active (deactivate-mark))
+      (message "Marked region copied to scrap")
     )
     (t
       (copy-line)
