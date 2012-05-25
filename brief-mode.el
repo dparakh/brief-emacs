@@ -2156,6 +2156,7 @@ possibliy with a prefix argument (default 8)"
   (file-exists-p   save-environment-filename)
   (file-readable-p save-environment-filename)
   (load-file       save-environment-filename)
+  (setq x-select-enable-clipboard t)
 )
 
 ;;; end of brief.el
