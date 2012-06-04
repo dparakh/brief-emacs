@@ -1244,8 +1244,10 @@
 (defun mark-m ()
   "Mark stream region"
   (interactive nil)
-  (mark-common 'm)
-  (message "Stream region marked")
+  (if (eq reg-flag 'm)
+      (progn (remove-mark-hook) (setq reg-flag nil) (message "Region mark released"))
+    (progn (mark-common 'm) (message "Stream region marked"))
+    )
 )
 
 (defun mark-common (new-reg-flag)
