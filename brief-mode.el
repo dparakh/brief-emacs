@@ -1087,7 +1087,7 @@
     (setq stack-number 0)
     (setq your-current-stack (cons "" search-history-list))
     (setq src-str (read-from-minibuffer
-                   "Stringe to search : "
+                   "String to search : "
                    ""
                    repeat-search-command-map
                   )
