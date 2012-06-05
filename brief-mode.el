@@ -639,7 +639,14 @@
     (if cur-str
       (progn
         (setq stack-number (1+ stack-number))
-        (erase-buffer)
+	; Erase buffer does not work because the mini-buffer also contains
+	; the read-only prompt, so we locate the next prop change
+	; and delete from there.
+        ;(erase-buffer)
+	(setq read-write-start (next-property-change 1))
+	(if read-write-start
+	    (delete-region read-write-start (point-max))
+	  )
         (insert cur-str)
         (goto-char (point-min))
       )
@@ -655,7 +662,13 @@
     (if (and cur-str (> stack-number 0))
       (progn
         (setq stack-number (1- stack-number))
-        (erase-buffer)
+	; Erase buffer does not work because the mini-buffer also contains
+	; the read-only prompt
+        ;(erase-buffer)
+	(setq read-write-start (next-property-change 1))
+	(if read-write-start
+	    (delete-region read-write-start (point-max))
+	  )
         (insert cur-str)
         (goto-char (point-min))
       )
@@ -763,6 +776,10 @@
                        "replace-from-history-list" replace-history-list-save)
       (save-user-stack replace-to-history-list
                        "replace-to-history-list" replace-history-list-save)
+
+      ; Saving of RegEx search state
+      (insert (format "(setq search-regexp-enabled %s)\n" (prin1-to-string search-regexp-enabled))) 
+
 
       ; Saving of bookmark list
       (if mark-list
@@ -1070,7 +1087,7 @@
     (setq stack-number 0)
     (setq your-current-stack (cons "" search-history-list))
     (setq src-str (read-from-minibuffer
-                   "String to search : "
+                   "Stringe to search : "
                    ""
                    repeat-search-command-map
                   )
