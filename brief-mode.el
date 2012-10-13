@@ -120,6 +120,13 @@
 ;;; ----------------
 ;;;
 ;;; You available to change this part to your own keyboard binding
+;;; 
+;;; For MacOS, some special bindings, in case a full keyboard is not present:
+;;; —§ü-x : Same as keypad minus
+;;; —§ü-c : Same as keypad plus
+;;; —§ü-v : Same as keypad insert
+;;; —§ü-backspace : Same as keypad delete
+;;;
 
 (if (string=  window-system "x")
   (progn
@@ -207,7 +214,8 @@
 ;;; kb:  Alt-g          - Goto line
 (global-set-key [?\M-g] 'goto-line)
 ;;; kb:  Alt-k          - delete to the end of line
-(global-set-key [?\M-k] 'kill-line)
+;;; (global-set-key [?\M-k] 'kill-line)
+(global-set-key [?\M-k] 'delete-rest-of-line)
 ;;; kb:  Alt-i          - Phy. tab (Brief default: Switch insert/overwrite mode)
 (global-set-key [?\M-i] 'overwrite-mode) 	;; reserve M-i for phy. tab
 (global-set-key [?\C-\M-i] 'overwrite-mode) 	;; no work?
@@ -235,6 +243,7 @@
 (global-set-key "\C-q\C-l" 'myresearch)
 (global-set-key "\C-q\C-r" 'myresearch-back)
 (global-set-key "\C-q\C-p" 'goto-previous) ;; the standard way is C-u C-SPC
+
 ;; cut & paste, idea from M$ Windoze
 ;;; kb:  C-q C-c	- Copy
 (global-set-key "\C-q\C-c" 'grey-plus)
@@ -243,6 +252,18 @@
 ;;; kb:  C-q C-x	- Cut
 (global-set-key "\C-q\C-x" 'grey-minus)
 
+;; Mac Only!
+;; copy, cut & paste - make Command-C, V, X equivalent to keypad plus, insert, and minus
+(if (eq window-system 'ns)
+    (cond
+     (t
+      (define-key osx-key-mode-map `[(,osxkeys-command-key c)] 'grey-plus)
+      (define-key osx-key-mode-map `[(,osxkeys-command-key v)] 'insert-key)
+      (define-key osx-key-mode-map `[(,osxkeys-command-key x)] 'grey-minus)
+      (define-key osx-key-mode-map `[(,osxkeys-command-key backspace)] 'grey-delete)
+      )
+     )
+  )
 
 ;;; kb:
 ;;; kb: == quoting & formatting
@@ -852,7 +873,15 @@
   (setq begin-point (point))
   (forward-line 1)
   (setq end-point (point))
-  (kill-region begin-point end-point))
+  (delete-region begin-point end-point))
+
+(defun delete-rest-of-line ()
+  ""
+  (interactive nil)
+  (setq begin-point (point))
+  (end-of-line)
+  (setq end-point (point))
+  (delete-region begin-point end-point))
 
 (defun cut-lines (start end)
   "Cut lines region."
