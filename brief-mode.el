@@ -127,6 +127,9 @@
 ;;; —§ü-v : Same as keypad insert
 ;;; —§ü-backspace : Same as keypad delete
 ;;;
+;;; In addition the following keys have been added
+;;;
+;;; M-h : Bound to ff-find-other-file : allows quickly loading headers or corresponding imelemntations
 
 (if (string=  window-system "x")
   (progn
@@ -296,6 +299,7 @@
 ;;; kb:  Alt-minus      - Previous buffer
 (global-set-key [?\M--] 'previous-buffer)
 ;;; kb:
+(global-set-key [?\M-h] 'ff-find-other-file)
 
 
 ;;; kb:
