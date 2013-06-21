@@ -1539,7 +1539,8 @@
       (message "Line region inserted")
     )
     (t
-      (message "Nothing to insert")
+     (clipboard-yank)
+;      (message "Nothing to insert")
     )
   )
 )
